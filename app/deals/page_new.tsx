@@ -194,7 +194,7 @@ export default async function DealsPage() {
           <TabsContent value="all">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {transformedAllDeals.slice(0, 12).map((deal) => (
-                <Card key={deal.id} className="hover:shadow-lg transition-shadow relative overflow-hidden flex flex-col h-full">
+                <Card key={deal.id} className="hover:shadow-lg transition-shadow relative overflow-hidden">
                   <CardHeader className="p-0">
                     <div className="relative">
                       <img src={deal.image} alt={deal.name} className="w-full h-48 object-cover" />
@@ -206,20 +206,20 @@ export default async function DealsPage() {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-4 flex flex-col flex-1">
+                  <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <Badge variant="secondary" className="w-fit">{deal.category}</Badge>
+                      <Badge variant="secondary">{deal.category}</Badge>
                       <Badge variant="outline" className={platformConfig[deal.platform as keyof typeof platformConfig]?.color || "bg-gray-500"}>
                         {platformConfig[deal.platform as keyof typeof platformConfig]?.displayName || deal.platform}
                       </Badge>
                     </div>
-                    <CardTitle className="text-lg mb-2 line-clamp-2 min-h-[3.5rem] flex items-start">{deal.name}</CardTitle>
+                    <CardTitle className="text-lg mb-2 line-clamp-2">{deal.name}</CardTitle>
                     <div className="flex items-center mb-3">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                       <span className="text-sm text-gray-600 ml-1">{deal.rating}</span>
                       <span className="text-sm text-gray-400 ml-2">{deal.shipping}</span>
                     </div>
-                    <div className="space-y-2 flex-1">
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-500">原價</span>
                         <span className="text-sm text-gray-400 line-through">
@@ -265,7 +265,7 @@ export default async function DealsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {platform.deals.map((deal) => (
-                  <Card key={deal.id} className="hover:shadow-lg transition-shadow relative overflow-hidden flex flex-col h-full">
+                  <Card key={deal.id} className="hover:shadow-lg transition-shadow relative overflow-hidden">
                     <CardHeader className="p-0">
                       <div className="relative">
                         <img src={deal.image} alt={deal.name} className="w-full h-48 object-cover" />
@@ -277,15 +277,15 @@ export default async function DealsPage() {
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="p-4 flex flex-col flex-1">
-                      <Badge variant="secondary" className="mb-2 w-fit">{deal.category}</Badge>
-                      <CardTitle className="text-lg mb-2 line-clamp-2 min-h-[3.5rem] flex items-start">{deal.name}</CardTitle>
+                    <CardContent className="p-4">
+                      <Badge variant="secondary" className="mb-2">{deal.category}</Badge>
+                      <CardTitle className="text-lg mb-2 line-clamp-2">{deal.name}</CardTitle>
                       <div className="flex items-center mb-3">
                         <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                         <span className="text-sm text-gray-600 ml-1">{deal.rating}</span>
                         <span className="text-sm text-gray-400 ml-2">{deal.shipping}</span>
                       </div>
-                      <div className="space-y-2 flex-1">
+                      <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-500">原價</span>
                           <span className="text-sm text-gray-400 line-through">

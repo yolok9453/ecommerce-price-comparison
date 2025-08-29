@@ -96,7 +96,7 @@ export default function SearchResults() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {searchResults.map((product) => (
-            <Card key={product.id} className="hover:shadow-lg transition-shadow">
+            <Card key={product.id} className="hover:shadow-lg transition-shadow flex flex-col h-full">
               <CardHeader className="p-0">
                 <div className="relative">
                   <img
@@ -109,17 +109,17 @@ export default function SearchResults() {
                   )}
                 </div>
               </CardHeader>
-              <CardContent className="p-4">
-                <Badge variant="secondary" className="mb-2">
+              <CardContent className="p-4 flex flex-col flex-1">
+                <Badge variant="secondary" className="mb-2 w-fit">
                   {product.category}
                 </Badge>
-                <CardTitle className="text-lg mb-2 line-clamp-2">{product.name}</CardTitle>
+                <CardTitle className="text-lg mb-2 line-clamp-2 min-h-[3.5rem] flex items-start">{product.name}</CardTitle>
                 <div className="flex items-center mb-3">
                   <span className="text-sm text-gray-600">
                     ⭐ {product.rating} ({product.stores} 家商店)
                   </span>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-500">最低價</span>
                     <span className="text-lg font-bold text-green-600">NT$ {product.minPrice.toLocaleString()}</span>

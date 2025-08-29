@@ -1,4 +1,4 @@
-import { Search, TrendingUp, Star, Menu } from "lucide-react"
+import { Search, TrendingUp, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -56,7 +56,7 @@ function generateRandomTimeLeft(): string {
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-export default async function HomePage() {
+async function HomePage() {
   // 從 Supabase 獲取數據
   const dailyDealsData = await getDailyDeals();
   const popularProductsData = await getPopularProducts(6);
@@ -68,7 +68,46 @@ export default async function HomePage() {
     "iPhone 15 Pro", "MacBook Air M3", "AirPods Pro", "iPad Pro", 
     "Nintendo Switch", "Sony耳機", "筆電", "手機殼"
   ];
+    name: "Nintendo Switch OLED",
+    image: "/placeholder.svg?height=200&width=200",
+    category: "遊戲機",
+    originalPrice: 12800,
+    dealPrice: 10780,
+    discount: 16,
+    stores: 6,
+    rating: 4.6,
+    timeLeft: "12:30:15",
+    dealType: "每日精選",
+  },
+  {
+    id: 5,
+    name: "AirPods Pro 第3代",
+    image: "/placeholder.svg?height=200&width=200",
+    category: "耳機",
+    originalPrice: 7490,
+    dealPrice: 6290,
+    discount: 16,
+    stores: 10,
+    rating: 4.5,
+    timeLeft: "19:45:30",
+    dealType: "限量特價",
+  },
+  {
+    id: 6,
+    name: "Samsung Galaxy S24 Ultra",
+    image: "/placeholder.svg?height=200&width=200",
+    category: "手機",
+    originalPrice: 42900,
+    dealPrice: 38900,
+    discount: 9,
+    stores: 7,
+    rating: 4.7,
+    timeLeft: "06:20:45",
+    dealType: "今日最低價",
+  },
+]
 
+export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -86,20 +125,13 @@ export default async function HomePage() {
               <Link href="#" className="text-sm font-medium hover:text-primary">
                 熱門商品
               </Link>
-              <Link href="/ai-assistant" className="text-sm font-medium hover:text-primary">
+              <Link href="#" className="text-sm font-medium hover:text-primary">
                 AI助手
               </Link>
               <Link href="/deals" className="text-sm font-medium hover:text-primary">
                 優惠情報
               </Link>
             </nav>
-            <div className="md:hidden">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/ai-assistant">
-                  🤖 AI助手
-                </Link>
-              </Button>
-            </div>
           </div>
         </div>
       </header>
@@ -119,14 +151,6 @@ export default async function HomePage() {
               <Input type="text" placeholder="搜尋商品名稱或型號..." className="pl-10 pr-4 py-3 text-lg" />
               <Button className="absolute right-2 top-1/2 transform -translate-y-1/2">搜尋</Button>
             </div>
-            <div className="text-center mt-4">
-              <p className="text-gray-600 mb-2">或者試試我們的</p>
-              <Button variant="outline" asChild>
-                <Link href="/ai-assistant" className="inline-flex items-center">
-                  🤖 AI智能助手
-                </Link>
-              </Button>
-            </div>
           </div>
         </div>
       </section>
@@ -141,7 +165,7 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {dailyDeals.map((deal) => (
-              <Card key={deal.id} className="hover:shadow-lg transition-shadow relative overflow-hidden flex flex-col h-full">
+              <Card key={deal.id} className="hover:shadow-lg transition-shadow relative overflow-hidden">
                 <CardHeader className="p-0">
                   <div className="relative">
                     <img src={deal.image || "/placeholder.svg"} alt={deal.name} className="w-full h-48 object-cover" />
@@ -152,18 +176,18 @@ export default async function HomePage() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="p-4 flex flex-col flex-1">
-                  <Badge variant="secondary" className="mb-2 w-fit">
+                <CardContent className="p-4">
+                  <Badge variant="secondary" className="mb-2">
                     {deal.category}
                   </Badge>
-                  <CardTitle className="text-lg mb-2 line-clamp-2 min-h-[3.5rem] flex items-start">{deal.name}</CardTitle>
+                  <CardTitle className="text-lg mb-2 line-clamp-2">{deal.name}</CardTitle>
                   <div className="flex items-center mb-3">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     <span className="text-sm text-gray-600 ml-1">
                       {deal.rating} ({deal.stores} 家商店)
                     </span>
                   </div>
-                  <div className="space-y-2 flex-1">
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500">原價</span>
                       <span className="text-sm text-gray-400 line-through">
@@ -182,7 +206,7 @@ export default async function HomePage() {
                     </div>
                   </div>
                   <Button className="w-full mt-4 bg-red-600 hover:bg-red-700" asChild>
-                    <Link href={deal.url || "#"} target="_blank">立即搶購</Link>
+                    <Link href={`/product/${deal.id}`}>立即搶購</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -190,8 +214,8 @@ export default async function HomePage() {
           </div>
 
           <div className="text-center mt-8">
-            <Button variant="outline" size="lg" asChild>
-              <Link href="/deals">查看更多優惠</Link>
+            <Button variant="outline" size="lg">
+              查看更多優惠
             </Button>
           </div>
         </div>
@@ -305,8 +329,9 @@ export default async function HomePage() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-            <p className="text-gray-400">&copy; 2025 比價王. 版權所有.</p>
+          <Separator className="my-8 bg-gray-700" />
+          <div className="text-center text-gray-400">
+            <p>&copy; 2024 比價王. All rights reserved.</p>
           </div>
         </div>
       </footer>

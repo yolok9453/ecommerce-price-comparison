@@ -1,4 +1,4 @@
-import { Search, TrendingUp, Star, Menu } from "lucide-react"
+import { Search, TrendingUp, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -86,20 +86,13 @@ export default async function HomePage() {
               <Link href="#" className="text-sm font-medium hover:text-primary">
                 熱門商品
               </Link>
-              <Link href="/ai-assistant" className="text-sm font-medium hover:text-primary">
+              <Link href="#" className="text-sm font-medium hover:text-primary">
                 AI助手
               </Link>
               <Link href="/deals" className="text-sm font-medium hover:text-primary">
                 優惠情報
               </Link>
             </nav>
-            <div className="md:hidden">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/ai-assistant">
-                  🤖 AI助手
-                </Link>
-              </Button>
-            </div>
           </div>
         </div>
       </header>
@@ -119,14 +112,6 @@ export default async function HomePage() {
               <Input type="text" placeholder="搜尋商品名稱或型號..." className="pl-10 pr-4 py-3 text-lg" />
               <Button className="absolute right-2 top-1/2 transform -translate-y-1/2">搜尋</Button>
             </div>
-            <div className="text-center mt-4">
-              <p className="text-gray-600 mb-2">或者試試我們的</p>
-              <Button variant="outline" asChild>
-                <Link href="/ai-assistant" className="inline-flex items-center">
-                  🤖 AI智能助手
-                </Link>
-              </Button>
-            </div>
           </div>
         </div>
       </section>
@@ -141,7 +126,7 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {dailyDeals.map((deal) => (
-              <Card key={deal.id} className="hover:shadow-lg transition-shadow relative overflow-hidden flex flex-col h-full">
+              <Card key={deal.id} className="hover:shadow-lg transition-shadow relative overflow-hidden">
                 <CardHeader className="p-0">
                   <div className="relative">
                     <img src={deal.image || "/placeholder.svg"} alt={deal.name} className="w-full h-48 object-cover" />
@@ -152,18 +137,18 @@ export default async function HomePage() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="p-4 flex flex-col flex-1">
-                  <Badge variant="secondary" className="mb-2 w-fit">
+                <CardContent className="p-4">
+                  <Badge variant="secondary" className="mb-2">
                     {deal.category}
                   </Badge>
-                  <CardTitle className="text-lg mb-2 line-clamp-2 min-h-[3.5rem] flex items-start">{deal.name}</CardTitle>
+                  <CardTitle className="text-lg mb-2 line-clamp-2">{deal.name}</CardTitle>
                   <div className="flex items-center mb-3">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     <span className="text-sm text-gray-600 ml-1">
                       {deal.rating} ({deal.stores} 家商店)
                     </span>
                   </div>
-                  <div className="space-y-2 flex-1">
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500">原價</span>
                       <span className="text-sm text-gray-400 line-through">

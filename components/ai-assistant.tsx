@@ -11,40 +11,34 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 const suggestedQuestions = [
   "幫我找最便宜的iPhone 15",
   "推薦性價比高的筆電",
-  "哪裡買Switch最划算？",
-  "比較AirPods和Sony耳機",
-  "預算3萬的手機推薦",
-  "最新優惠有哪些？",
+  "哪裡買Nintendo Switch最划算？",
+  "比較MacBook和Windows筆電",
+  "預算2萬的遊戲筆電推薦",
+  "最新手機優惠有哪些？",
+  "推薦好用的無線滑鼠",
+  "電競鍵盤推薦",
 ]
 
-const mockResponses = {
-  "幫我找最便宜的iPhone 15": {
-    text: "根據最新比價資料，iPhone 15 128GB目前最低價格是NT$ 26,900，在PChome 24h購物。相比原價NT$ 29,900，可以省下NT$ 3,000！",
-    products: [
-      { name: "iPhone 15 128GB", price: 26900, store: "PChome 24h", discount: 10 },
-      { name: "iPhone 15 128GB", price: 27200, store: "momo購物", discount: 9 },
-    ],
-  },
-  推薦性價比高的筆電: {
-    text: "為您推薦幾款高性價比筆電：MacBook Air M3性能優異，ASUS VivoBook價格親民，Lenovo ThinkPad商務首選。",
-    products: [
-      { name: "MacBook Air M3", price: 35900, store: "多家商店", discount: 8 },
-      { name: "ASUS VivoBook 15", price: 18900, store: "多家商店", discount: 15 },
-    ],
-  },
+interface Product {
+  name: string
+  price: number
+  store: string
+  url?: string
+  discount?: number
+  description?: string
 }
 
 interface Message {
   id: number
   type: "user" | "ai"
   content: string
-  products?: Array<{
-    name: string
-    price: number
-    store: string
-    discount: number
-  }>
+  products?: Product[]
   timestamp: Date
+}
+
+interface ChatHistory {
+  user: string
+  assistant: string
 }
 
 export default function AIAssistant() {
@@ -59,6 +53,7 @@ export default function AIAssistant() {
   ])
   const [inputValue, setInputValue] = useState("")
   const [isTyping, setIsTyping] = useState(false)
+  const [chatHistory, setChatHistory] = useState<ChatHistory[]>([])
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return
@@ -74,23 +69,55 @@ export default function AIAssistant() {
     setInputValue("")
     setIsTyping(true)
 
-    // Simulate AI response
-    setTimeout(() => {
-      const response = mockResponses[message as keyof typeof mockResponses] || {
-        text: `我正在為您搜尋「${message}」的相關資訊，請稍候...`,
-        products: [],
+    try {
+      // Call AI Assistant API
+      const response = await fetch('/api/ai-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message,
+          chatHistory,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('API request failed')
       }
+
+      const data = await response.json()
 
       const aiMessage: Message = {
         id: Date.now() + 1,
         type: "ai",
-        content: response.text,
-        products: response.products,
+        content: data.response,
+        products: data.products || [],
         timestamp: new Date(),
       }
+
       setMessages((prev) => [...prev, aiMessage])
+      
+      // Update chat history for context
+      setChatHistory((prev) => [
+        ...prev,
+        { user: message, assistant: data.response }
+      ])
+
+    } catch (error) {
+      console.error('Error calling AI assistant:', error)
+      
+      const errorMessage: Message = {
+        id: Date.now() + 1,
+        type: "ai",
+        content: "抱歉，目前服務暫時無法使用，請稍後再試。如果問題持續，請聯繫客服人員。",
+        timestamp: new Date(),
+      }
+      
+      setMessages((prev) => [...prev, errorMessage])
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
   const handleSuggestedQuestion = (question: string) => {
@@ -177,15 +204,37 @@ export default function AIAssistant() {
                         >
                           <p className="whitespace-pre-line">{message.content}</p>
                           {message.products && message.products.length > 0 && (
-                            <div className="mt-3 space-y-2">
+                            <div className="mt-3 space-y-3">
                               {message.products.map((product, index) => (
-                                <div key={index} className="bg-white rounded p-2 text-gray-900">
-                                  <div className="flex justify-between items-center">
-                                    <span className="font-medium">{product.name}</span>
-                                    <Badge variant="destructive">-{product.discount}%</Badge>
+                                <div key={index} className="bg-white rounded-lg p-3 text-gray-900 border border-gray-200">
+                                  <div className="flex justify-between items-start mb-2">
+                                    <div className="flex-1">
+                                      <h4 className="font-medium text-sm">{product.name}</h4>
+                                      <p className="text-xs text-gray-500 mt-1">{product.store}</p>
+                                      {product.description && (
+                                        <p className="text-xs text-gray-600 mt-1">{product.description}</p>
+                                      )}
+                                    </div>
+                                    {product.discount && (
+                                      <Badge variant="destructive" className="text-xs">
+                                        -{product.discount}%
+                                      </Badge>
+                                    )}
                                   </div>
-                                  <div className="text-sm text-gray-600">
-                                    NT$ {product.price.toLocaleString()} - {product.store}
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-lg font-bold text-primary">
+                                      NT$ {product.price.toLocaleString()}
+                                    </span>
+                                    {product.url && (
+                                      <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        className="text-xs"
+                                        onClick={() => window.open(product.url, '_blank')}
+                                      >
+                                        查看商品
+                                      </Button>
+                                    )}
                                   </div>
                                 </div>
                               ))}
