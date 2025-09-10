@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenAI } from '@google/genai'
 
 // 初始化 Google AI
-const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null
+const ai = new GoogleGenAI({});
 
 // 模擬商品數據結構
 interface Product {
@@ -18,6 +18,9 @@ interface AIResponse {
   response: string
   products: Product[]
 }
+
+// 伺服器端快取
+const responseCache = new Map<string, AIResponse>()
 
 // 模擬關鍵詞提取功能
 function extractKeywords(userInput: string, chatHistory: Array<{user: string, assistant: string}>): string {
@@ -263,10 +266,8 @@ async function searchProducts(query: string): Promise<Product[]> {
 async function generateResponse(userInput: string, products: Product[], chatHistory: Array<{user: string, assistant: string}>): Promise<string> {
   
   // 🤖 使用真正的 AI 模型
-  if (genAI) {
+  if (ai) {
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" })
-      
       const systemPrompt = `你是一個親切、積極主動的台灣電商客服助手，專為台灣用戶服務。你的任務是：
 
 1. 以友善、像跟朋友聊天一樣的語氣回應用戶，無論是閒聊、回答問題還是提供商品推薦。
@@ -284,19 +285,29 @@ async function generateResponse(userInput: string, products: Product[], chatHist
 
 請用繁體中文回應，並提供實用的購物建議。如果有商品資料，請以友善的方式介紹商品特色和比價結果。`
 
-      const result = await model.generateContent([
-        { text: systemPrompt },
-        { text: `用戶問題：${userInput}` }
-      ])
+      const result = await ai.models.generateContent({
+        model: "gemini-2.5-flash-lite",
+        contents: `${systemPrompt}\n\n用戶問題：${userInput}`
+      })
       
-      const response = result.response
-      const aiText = response.text()
+      const aiText = result.text
       
       return aiText || "抱歉，我現在無法處理您的請求。"
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('AI 模型錯誤:', error)
-      // 如果 AI 失敗，退回到規則式系統
+      
+      // 如果是配額或權限問題，提供友善的錯誤訊息
+      if (error?.status === 429) {
+        console.warn('Gemini API 配額已用完，切換到規則式回應')
+        // 繼續使用規則式系統
+      } else if (error?.status === 401 || error?.status === 403) {
+        console.warn('Gemini API 認證失敗，切換到規則式回應')
+        // 繼續使用規則式系統
+      } else {
+        console.error('未知的 AI 錯誤:', error?.message || error)
+        // 繼續使用規則式系統
+      }
     }
   }
 
@@ -359,6 +370,12 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // 檢查快取
+    if (responseCache.has(message)) {
+      console.log('從快取提供回應')
+      return NextResponse.json(responseCache.get(message))
+    }
     
     // 提取關鍵詞
     const keywords = extractKeywords(message, chatHistory)
@@ -383,6 +400,9 @@ export async function POST(request: NextRequest) {
       products: products.slice(0, 5) // 限制最多返回5個商品
     }
     
+    // 儲存到快取
+    responseCache.set(message, response)
+
     return NextResponse.json(response)
     
   } catch (error) {

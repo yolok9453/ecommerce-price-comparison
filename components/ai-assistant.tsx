@@ -200,19 +200,20 @@ export default function AIAssistant() {
                           )}
                         </div>
                         <div
-                          className={`rounded-lg p-3 ${message.type === "user" ? "bg-primary text-white" : "bg-gray-100"}`}
+                          className={`rounded-lg p-3 break-words max-w-full overflow-auto ${message.type === "user" ? "bg-primary text-white" : "bg-gray-100"}`}
+                          style={{ wordBreak: "break-word", whiteSpace: "pre-line" }}
                         >
-                          <p className="whitespace-pre-line">{message.content}</p>
+                          <p className="whitespace-pre-line break-words max-w-full" style={{ wordBreak: "break-word" }}>{message.content}</p>
                           {message.products && message.products.length > 0 && (
                             <div className="mt-3 space-y-3">
                               {message.products.map((product, index) => (
-                                <div key={index} className="bg-white rounded-lg p-3 text-gray-900 border border-gray-200">
+                                <div key={index} className="bg-white rounded-lg p-3 text-gray-900 border border-gray-200 break-words max-w-full" style={{ wordBreak: "break-word" }}>
                                   <div className="flex justify-between items-start mb-2">
                                     <div className="flex-1">
-                                      <h4 className="font-medium text-sm">{product.name}</h4>
-                                      <p className="text-xs text-gray-500 mt-1">{product.store}</p>
+                                      <h4 className="font-medium text-sm break-words max-w-full" style={{ wordBreak: "break-word" }}>{product.name}</h4>
+                                      <p className="text-xs text-gray-500 mt-1 break-words max-w-full" style={{ wordBreak: "break-word" }}>{product.store}</p>
                                       {product.description && (
-                                        <p className="text-xs text-gray-600 mt-1">{product.description}</p>
+                                        <p className="text-xs text-gray-600 mt-1 break-words max-w-full" style={{ wordBreak: "break-word" }}>{product.description}</p>
                                       )}
                                     </div>
                                     {product.discount && (
